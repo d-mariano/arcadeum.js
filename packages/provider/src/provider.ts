@@ -84,6 +84,7 @@ export class Provider implements AsyncSendable {
       } catch (e) {
         callback(e)
       }
+      return true
     } else {
       return false
     }
@@ -126,6 +127,7 @@ export class Provider implements AsyncSendable {
             }
           }
         })
+        return true
       } catch (e) {
         callback(e)
       }
@@ -191,7 +193,6 @@ export class Provider implements AsyncSendable {
 
   private async getTransactionReceipt(payload: Web3Payload, callback: (error: any, response?: Web3Response) => void) {
     const metaTxId = payload.params[0]
-
     if (await this._wallet.relayer.isMetaTxHash(metaTxId)) {
       try {
         const receipt = await this._wallet.relayer.getMetaTxnReceipt(metaTxId)

@@ -28,16 +28,18 @@ export class Provider implements AsyncSendable {
   }
 
   sendAsync(payload: Web3Payload, callback: (error: any, response?: Web3Response) => void) {
-    if (!this.handle(payload, callback)) {
-      if (this.provider.sendAsync) {
-        this.provider.sendAsync(payload, callback)
-      } else {
-        this.provider.send(payload, callback)
+    this.handle(payload, callback).then((handled) => {
+      if (!handled) {
+        if (this.provider.sendAsync) {
+          this.provider.sendAsync(payload, callback)
+        } else {
+          this.provider.send(payload, callback)
+        }
       }
-    }
+    })
   }
 
-  private handle(payload: Web3Payload, callback: (error: any, response?: Web3Response) => void) {
+  private async handle(payload: Web3Payload, callback: (error: any, response?: Web3Response) => void) {
     switch (payload.method) {
       case 'eth_accounts':
         return this.accounts(payload, callback)

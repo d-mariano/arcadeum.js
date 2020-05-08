@@ -201,3 +201,11 @@ export type AuxTransactionRequest = TransactionRequest & {
 }
 
 export declare type Transactionish = (AuxTransactionRequest | ArcadeumTransaction | ArcadeumTransaction[] | AuxTransactionRequest[])
+
+export type MetaTxReceipt = {
+  id: string,
+  status: string,
+  reverReason: string,
+  gasUsed: BigNumberish,
+  txnReceipt: string
+}

@@ -51,6 +51,8 @@ export class Provider implements AsyncSendable {
         return this.sendTransaction(payload, callback)
       case 'eth_getTransactionCount':
         return this.getTransactionCount(payload, callback)
+      case 'eth_getTransactionReceipt':
+        return this.getTransactionReceipt(payload, callback)
     }
   }
 
@@ -176,6 +178,33 @@ export class Provider implements AsyncSendable {
           jsonrpc: "2.0",
           result: ethers.utils.bigNumberify(await count).toHexString()
         })
+      } catch (e) {
+        callback(e)
+      }
+      return true
+    } else {
+      return false
+    }
+  }
+
+  private async getTransactionReceipt(payload: Web3Payload, callback: (error: any, response?: Web3Response) => void) {
+    const metaTxId = payload.params[0]
+
+    if (await this._wallet.relayer.isMetaTxHash(metaTxId)) {
+      try {
+        const receipt = await this._wallet.relayer.getMetaTxnReceipt(metaTxId)
+        const ethTransactionHash = receipt ? receipt.txnReceipt : undefined
+
+        if (ethTransactionHash) {
+          payload.params[0] = ethTransactionHash
+          this.sendAsync(payload, callback)
+        } else {
+          callback(undefined, {
+            id: payload.id,
+            jsonrpc: "2.0",
+            result: null
+          })
+        }
       } catch (e) {
         callback(e)
       }

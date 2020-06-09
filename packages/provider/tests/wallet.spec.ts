@@ -54,7 +54,7 @@ describe('Arcadeum wallet integration', function () {
       mainModule,
       mainModuleUpgradable,
       guestModule
-    ] = await deployArcadeum(ganache.provider)
+    ] = await deployArcadeum(ganache.provider.getSigner())
 
     // Create fixed context obj
     context = {

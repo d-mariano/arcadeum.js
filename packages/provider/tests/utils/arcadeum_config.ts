@@ -1,5 +1,5 @@
 import { Provider } from 'ethers/providers'
-import { ethers } from 'ethers'
+import { ethers, Signer } from 'ethers'
 
 import { MainModule } from 'arcadeum-wallet/typings/contracts/MainModule'
 import { MainModuleUpgradable } from 'arcadeum-wallet/typings/contracts/MainModuleUpgradable'
@@ -13,7 +13,7 @@ const GuestModuleArtifact = require('arcadeum-wallet/artifacts/GuestModule.json'
 
 ethers.errors.setLogLevel('error')
 
-export async function deployArcadeum(provider: Provider): Promise<[
+export async function deployArcadeum(signer: Signer): Promise<[
   Factory,
   MainModule,
   MainModuleUpgradable,
@@ -22,25 +22,25 @@ export async function deployArcadeum(provider: Provider): Promise<[
   const factory = ((await new ethers.ContractFactory(
     FactoryArtifact.abi,
     FactoryArtifact.bytecode,
-    (provider as any).getSigner()
+    signer
   ).deploy()) as unknown) as Factory
 
   const mainModule = ((await new ethers.ContractFactory(
     MainModuleArtifact.abi,
     MainModuleArtifact.bytecode,
-    (provider as any).getSigner()
+    signer
   ).deploy(factory.address)) as unknown) as MainModule
 
   const mainModuleUpgradable = ((await new ethers.ContractFactory(
     MainModuleUpgradableArtifact.abi,
     MainModuleUpgradableArtifact.bytecode,
-    (provider as any).getSigner()
+    signer
   ).deploy()) as unknown) as MainModuleUpgradable
 
   const guestModule = ((await new ethers.ContractFactory(
     GuestModuleArtifact.abi,
     GuestModuleArtifact.bytecode,
-    (provider as any).getSigner()
+    signer
   ).deploy()) as unknown) as GuestModule
 
   return [factory, mainModule, mainModuleUpgradable, guestModule]

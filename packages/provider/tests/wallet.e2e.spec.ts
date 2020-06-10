@@ -53,31 +53,32 @@ if (process.env.ONLY_E2E) {
       relayer = new RpcRelayer(relayer_rpc, false, provider)
 
       // Create wallet
-      wallet = await arcadeum.Wallet.singleOwner(ARCADEUM_CONTEXT, ethers.utils.randomBytes(32))
+      wallet = await arcadeum.Wallet.singleOwner(ARCADEUM_CONTEXT, pk)
       wallet = wallet.connect(eth_rpc, relayer)
 
       // Deploy wallet
-      let deployWallet = await arcadeum.Wallet.singleOwner(ARCADEUM_CONTEXT, ethers.utils.randomBytes(32))
+      let deployWallet = await arcadeum.Wallet.singleOwner(ARCADEUM_CONTEXT, pk)
       deployWallet = deployWallet.connect(eth_rpc, relayer)
 
       // Deploy call receiver mock
       callReceiver = (await new ethers.ContractFactory(
         CallReceiverMockArtifact.abi,
         CallReceiverMockArtifact.bytecode,
-        deployWallet
+        signer
       ).deploy()) as CallReceiverMock
       await callReceiver.deployTransaction.wait()
     })
 
     describe('Send transactions', () => {
       it('Should wait for transaction receipt', async () => {
+        const data = ethers.utils.randomBytes(1024)
         const transaction = [
           {
             gasPrice: '20000000000',
             gas: '121000',
             to: callReceiver.address,
             value: 0,
-            data: callReceiver.interface.functions.testCall.encode([24123, '0x'])
+            data: callReceiver.interface.functions.testCall.encode([24123, data])
           }
         ]
 
@@ -94,26 +95,26 @@ if (process.env.ONLY_E2E) {
         expect(receipt.cumulativeGasUsed).to.exist
         expect(receipt.status).to.exist
 
-        expect(await callReceiver.lastValA()).to.equal(24123)
+        expect((await callReceiver.lastValA()).toString()).to.equal("24123")
       })
-      it('Should get use the nonce of the relayer', async () => {
-        const addr = ethers.utils.getAddress(ethers.utils.hexlify(ethers.utils.randomBytes(20)))
-        const data = ethers.utils.randomBytes(64)
-        const transaction = [
-          {
-            gasPrice: '20000000000',
-            gas: '121000',
-            to: addr,
-            value: 0,
-            data: data
-          }
-        ]
+      // it('Should get use the nonce of the relayer', async () => {
+      //   const addr = ethers.utils.getAddress(ethers.utils.hexlify(ethers.utils.randomBytes(20)))
+      //   const data = ethers.utils.randomBytes(64)
+      //   const transaction = [
+      //     {
+      //       gasPrice: '20000000000',
+      //       gas: '121000',
+      //       to: addr,
+      //       value: 0,
+      //       data: data
+      //     }
+      //   ]
 
-        const tx = await wallet.sendTransaction(transaction)
-        const receipt = await tx.wait()
+      //   const tx = await wallet.sendTransaction(transaction)
+      //   const receipt = await tx.wait()
 
 
-      })
+      // })
     })
   })
 }

@@ -2,7 +2,7 @@
 import { expect } from 'chai';
 
 import * as arcadeum from '../src'
-import { ethers, Signer } from 'ethers';
+import { ethers } from 'ethers';
 import { encodeMessageData, recoverConfig } from '../src/utils';
 
 describe('Arcadeum wallet units', function() {

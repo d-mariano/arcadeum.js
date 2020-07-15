@@ -1,5 +1,5 @@
 import { deployArcadeum } from './utils/arcadeum_config'
-import { ethers, Signer, Wallet } from 'ethers'
+import { ethers, Signer } from 'ethers'
 import * as Ganache from 'ganache-cli'
 
 import { CallReceiverMock } from 'arcadeum-wallet/typings/contracts/CallReceiverMock'
